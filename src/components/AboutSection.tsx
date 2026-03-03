@@ -157,7 +157,7 @@ const AboutSection = () => {
                 className="flex flex-wrap gap-3"
               >
                 <a href={hero.resumeUrl} download className="btn-primary"><span>Download Resume</span></a>
-                <a href={`mailto:${about.email}`} className="btn-outline">Get in Touch</a>
+                <a href="#contact" onClick={(e) => { e.preventDefault(); document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); }} className="btn-outline">Get in Touch</a>
               </motion.div>
             </div>
 

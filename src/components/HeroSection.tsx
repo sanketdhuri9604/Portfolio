@@ -65,7 +65,7 @@ const HeroSection = () => {
 
         {/* Watermark */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center justify-center select-none overflow-hidden">
-          <span className="text-[22vw] font-black leading-none tracking-tighter opacity-[0.025]" style={{ fontFamily: "'Syne', sans-serif", color: "#00FF87" }}>{hero.firstName}</span>
+          <span className="text-[12vw] font-black leading-none tracking-tighter opacity-[0.035]" style={{ fontFamily: "'Syne', sans-serif", color: "#00FF87" }}>{hero.firstName}</span>
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-6xl">
