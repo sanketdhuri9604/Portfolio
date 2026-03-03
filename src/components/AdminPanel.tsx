@@ -831,7 +831,8 @@ export const AdminToggle = () => {
   const [showGate, setShowGate] = useState(false);
 
   // Only show admin button on /admin route
-  if (window.location.pathname !== "/admin") return null;
+ const path = window.location.pathname.replace(/\/$/, "");
+if (path !== "/admin") return null;
 
   const handleEditClick = () => {
     if (authenticated) {

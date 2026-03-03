@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { loadData, loadDataAsync, saveDataAsync } from "@/portfolioData";
 import type { PortfolioData } from "@/portfolioData";
@@ -14,16 +14,18 @@ interface PortfolioContextType {
 export const PortfolioContext = createContext<PortfolioContextType | null>(null);
 
 function PortfolioProvider({ children }: { children: ReactNode }) {
+  // Instantly load from localStorage — no blocking
   const [data, setDataState] = useState<PortfolioData>(loadData);
-  const [isSyncing, setIsSyncing] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false); // ← no skeleton on start
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
+    // Background sync from Supabase — silently updates data when ready
     loadDataAsync()
-      .then((latest) => { 
-  setDataState(latest); 
-  document.title = `Sanket's Portfolio`;
-})
+      .then((latest) => {
+        setDataState(latest);
+        document.title = `Sanket's Portfolio`;
+      })
       .catch(console.warn)
       .finally(() => setIsSyncing(false));
   }, []);
