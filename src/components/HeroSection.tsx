@@ -100,7 +100,7 @@ const HeroSection = () => {
           >
             <span className="inline-flex h-1.5 w-1.5 rounded-full bg-[#00FF87] shadow-[0_0_8px_#00FF87] animate-pulse" />
             <span className="w-6 h-px bg-gradient-to-r from-[#00FF87] to-transparent" />
-            Full-Stack Developer &amp; AI Engineer
+            {hero.eyebrow}
           </motion.div>
 
           {/* H1 */}

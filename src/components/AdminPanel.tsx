@@ -210,9 +210,11 @@ const HeroTab = ({ draft, up }: TabProps) => (
     </SectionCard>
     <SectionCard title="Links">
       <div><Label>Resume PDF URL</Label><Input value={draft.hero.resumeUrl} onChange={e => up("hero", { resumeUrl: e.target.value })} /></div>
+      <div><Label>Eyebrow Text</Label><Input value={draft.hero.eyebrow ?? ''} onChange={e => up("hero", { eyebrow: e.target.value })} placeholder="Full-Stack Developer & AI Engineer" /></div>
     </SectionCard>
   </div>
 );
+
 
 // ── About Tab ────────────────────────────────────────────────────────────────
 const AboutTab = ({ draft, up }: TabProps) => (
