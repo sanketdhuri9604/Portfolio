@@ -13,8 +13,8 @@ import PortfolioProvider from "../components/PortfolioContext";
 import { AdminToggle } from "../components/AdminPanel";
 
 const IndexContent = () => {
-  const { isSyncing } = usePortfolio();
-  if (isSyncing) return <SkeletonLoader />;
+ const { isLoading } = usePortfolio();
+if (isLoading) return <SkeletonLoader />;
   return (
     <div className="min-h-screen">
       <Navbar />

@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import { loadData, loadDataAsync, saveDataAsync } from "@/portfolioData";
+import { loadDataAsync, saveDataAsync, defaultData } from "@/portfolioData";
 import type { PortfolioData } from "@/portfolioData";
 
 interface PortfolioContextType {
@@ -9,14 +9,17 @@ interface PortfolioContextType {
   save: (data: PortfolioData) => Promise<void>;
   isSyncing: boolean;
   isSaving: boolean;
+  isLoading: boolean;
 }
 
 export const PortfolioContext = createContext<PortfolioContextType | null>(null);
 
 function PortfolioProvider({ children }: { children: ReactNode }) {
-  const [data, setDataState] = useState<PortfolioData>(loadData);
+  // Start with defaultData (not localStorage) — nothing renders until Supabase responds
+  const [data, setDataState] = useState<PortfolioData>(defaultData);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // ← skeleton shown until this is false
 
   useEffect(() => {
     const timeout = new Promise<never>((_, reject) =>
@@ -38,9 +41,12 @@ function PortfolioProvider({ children }: { children: ReactNode }) {
         document.title = `Sanket's Portfolio`;
       })
       .catch(() => {
-        console.warn("Supabase unavailable, using cached data");
+        console.warn("Supabase unavailable, using default data");
       })
-      .finally(() => setIsSyncing(false));
+      .finally(() => {
+        setIsLoading(false); // ← skeleton hatao, real data dikhaao
+        setIsSyncing(false);
+      });
   }, []);
 
   const setData = (d: PortfolioData) => setDataState(d);
@@ -59,7 +65,7 @@ function PortfolioProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <PortfolioContext.Provider value={{ data, setData, save, isSyncing, isSaving }}>
+    <PortfolioContext.Provider value={{ data, setData, save, isSyncing, isSaving, isLoading }}>
       {children}
     </PortfolioContext.Provider>
   );
