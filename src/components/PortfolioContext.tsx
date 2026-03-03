@@ -14,19 +14,25 @@ interface PortfolioContextType {
 export const PortfolioContext = createContext<PortfolioContextType | null>(null);
 
 function PortfolioProvider({ children }: { children: ReactNode }) {
-  // Instantly load from localStorage — no blocking
   const [data, setDataState] = useState<PortfolioData>(loadData);
-  const [isSyncing, setIsSyncing] = useState(false); // ← no skeleton on start
+  const [isSyncing, setIsSyncing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    // Background sync from Supabase — silently updates data when ready
-    loadDataAsync()
+    // 5 second timeout — agar Supabase slow ho toh wait nahi karta
+    const timeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("timeout")), 5000)
+    );
+
+    Promise.race([loadDataAsync(), timeout])
       .then((latest) => {
-        setDataState(latest);
+        setDataState(latest as PortfolioData);
         document.title = `Sanket's Portfolio`;
       })
-      .catch(console.warn)
+      .catch(() => {
+        // Supabase failed ya timeout — localStorage/default data already show ho raha hai
+        console.warn("Supabase unavailable, using cached data");
+      })
       .finally(() => setIsSyncing(false));
   }, []);
 
