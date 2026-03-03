@@ -7,6 +7,7 @@ export interface Project {
   num: string;
   title: string;
   description: string;
+  longDescription?: string;
   tags: string[];
   filters: ("Web" | "AI/ML" | "Mobile" | "Backend")[];
   year: string;
@@ -14,6 +15,7 @@ export interface Project {
   liveUrl?: string;
   githubUrl?: string;
   image: string;
+  images?: string[];
   accent: string;
 }
 
@@ -41,6 +43,7 @@ export interface PortfolioData {
     name: string;
     firstName: string;
     tagline: string;
+    taglineSuffix?: string;
     subtitle: string;
     badge: string;
     githubUrl: string;
@@ -216,18 +219,15 @@ export async function loadDataAsync(): Promise<PortfolioData> {
     if (error || !data) throw new Error("No data");
 
     const parsed = data.data as PortfolioData;
-    // Cache locally for instant next load
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); } catch { /* ignore */ }
     return { ...defaultData, ...parsed };
   } catch {
-    // Fallback to localStorage cache
     return loadData();
   }
 }
 
 // ── Save to Supabase (cross-device) ───────────────────────────────────────────
 export async function saveDataAsync(data: PortfolioData): Promise<void> {
-  // Save to localStorage instantly
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch { /* ignore */ }
 
   const { error } = await supabase
