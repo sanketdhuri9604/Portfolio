@@ -69,7 +69,7 @@ const ContactSection = () => {
           >
             Let's work{" "}<span className="text-gradient">together</span>
           </h2>
-          <p className="mt-4 max-w-md text-base text-[rgba(255,255,255,0.35)] leading-relaxed" style={{ fontWeight: 300 }}>
+          <p className="mt-4 max-w-md text-base text-[rgba(255,255,255,0.65)] leading-relaxed" style={{ fontWeight: 300 }}>
             {contact.tagline}
           </p>
         </motion.div>
@@ -142,7 +142,7 @@ const ContactSection = () => {
                 </span>
                 <span className="text-sm font-medium" style={{ color: "#00FF87", fontFamily: "'DM Mono', monospace" }}>Available now</span>
               </div>
-              <p className="text-xs text-[rgba(255,255,255,0.3)] leading-relaxed">{contact.availability}</p>
+              <p className="text-xs text-[rgba(255,255,255,0.62)] leading-relaxed">{contact.availability}</p>
             </div>
 
             {/* Location */}
@@ -152,7 +152,7 @@ const ContactSection = () => {
               </span>
               <div>
                 <p className="mono-label mb-0.5">Based in</p>
-                <p className="text-sm text-[rgba(255,255,255,0.7)]">{contact.location}</p>
+                <p className="text-sm text-[rgba(255,255,255,0.85)]">{contact.location}</p>
               </div>
             </div>
 
@@ -166,7 +166,7 @@ const ContactSection = () => {
                     href={href}
                     target={href.startsWith("mailto") ? undefined : "_blank"}
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-[rgba(255,255,255,0.4)] transition-all hover:bg-[rgba(0,255,135,0.05)] hover:text-[rgba(255,255,255,0.85)] group"
+                    className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-[rgba(255,255,255,0.62)] transition-all hover:bg-[rgba(0,255,135,0.05)] hover:text-[rgba(255,255,255,0.85)] group"
                   >
                     <div className="flex items-center gap-3">
                       <Icon className="h-4 w-4 group-hover:text-[#00FF87] transition-colors" />
@@ -190,11 +190,11 @@ const ContactSection = () => {
           style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
           role="contentinfo"
         >
-          <p className="text-sm text-[rgba(255,255,255,0.2)]">
+          <p className="text-sm text-[rgba(255,255,255,0.45)]">
             © {contact.footerYear}{" "}
             <span className="text-[rgba(255,255,255,0.5)] font-medium">{contact.footerName}</span>. Built with passion &amp; clean code.
           </p>
-          <p className="text-xs text-[rgba(255,255,255,0.15)]">Made in Mumbai 🇮🇳</p>
+          <p className="text-xs text-[rgba(255,255,255,0.38)]">Made in Mumbai 🇮🇳</p>
         </motion.footer>
       </div>
     </section>

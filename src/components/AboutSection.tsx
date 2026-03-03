@@ -27,7 +27,7 @@ const Stat = ({ value, suffix, label, inView, delay }: { value: number; suffix: 
       className="glass rounded-2xl p-6 text-center glow-sm card-lift noise"
     >
       <p className="text-4xl font-black text-gradient mb-1" style={{ fontFamily: "'Syne', sans-serif" }}>{count}{suffix}</p>
-      <p className="mono-label">{label}</p>
+      <p className="mono-label" style={{ color: "rgba(255,255,255,0.55)" }}>{label}</p>
     </motion.div>
   );
 };
@@ -45,8 +45,8 @@ const InfoCard = ({ icon: Icon, title, value, delay }: { icon: React.ElementType
       <Icon className="h-4 w-4" style={{ color: "#00FF87" }} aria-hidden="true" />
     </span>
     <div>
-      <p className="mono-label mb-0.5">{title}</p>
-      <p className="text-sm font-medium text-[rgba(255,255,255,0.75)]">{value}</p>
+      <p className="mono-label mb-0.5" style={{ color: "rgba(255,255,255,0.5)" }}>{title}</p>
+      <p className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.92)" }}>{value}</p>
     </div>
   </motion.div>
 );
@@ -66,7 +66,6 @@ const AboutSection = () => {
   return (
     <>
       <section ref={sectionRef} id="about" className="py-32 px-6 relative overflow-hidden" aria-labelledby="about-heading">
-        {/* Ambient glow */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -left-40 top-1/2 h-80 w-80 -translate-y-1/2 rounded-full blur-[100px]"
@@ -118,14 +117,14 @@ const AboutSection = () => {
                   </div>
                   <div>
                     <p className="font-bold text-lg text-[rgba(255,255,255,0.9)]" style={{ fontFamily: "'Syne', sans-serif" }}>{hero.name}</p>
-                    <p className="text-sm text-[rgba(255,255,255,0.35)]">{hero.subtitle.split("\n")[0]}</p>
+                    <p className="text-sm" style={{ color: "rgba(255,255,255,0.55)" }}>{hero.subtitle.split("\n")[0]}</p>
                     <div className="mt-2 flex items-center gap-1.5">
                       <span className="status-pulse" />
                       <span className="mono-label" style={{ color: "#00FF87" }}>Open to work</span>
                     </div>
                   </div>
                 </div>
-                <p className="text-sm leading-[1.9] text-[rgba(255,255,255,0.5)]">{about.bio}</p>
+                <p className="text-sm leading-[1.9]" style={{ color: "rgba(255,255,255,0.72)" }}>{about.bio}</p>
               </motion.div>
 
               <div>
@@ -134,7 +133,8 @@ const AboutSection = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.1 }}
-                  className={`text-base leading-[1.9] text-[rgba(255,255,255,0.35)] ${!showMore ? "line-clamp-4" : ""}`}
+                  className={`text-base leading-[1.9] ${!showMore ? "line-clamp-4" : ""}`}
+                  style={{ color: "rgba(255,255,255,0.65)" }}
                 >
                   {about.bio2}
                 </motion.p>
@@ -187,14 +187,14 @@ const AboutSection = () => {
                 transition={{ delay: 0.5 }}
                 className="glass rounded-2xl p-6 noise"
               >
-                <p className="mono-label mb-4">Core Stack</p>
+                <p className="mono-label mb-4" style={{ color: "rgba(255,255,255,0.55)" }}>Core Stack</p>
                 <div className="flex flex-wrap gap-2">
                   {about.coreStack.map((t) => (
                     <motion.span
                       key={t}
                       whileHover={{ scale: 1.06, y: -2 }}
-                      className="inline-block rounded-xl border border-[rgba(0,255,135,0.12)] bg-[rgba(0,255,135,0.04)] px-3 py-1.5 text-xs font-medium text-[rgba(0,255,135,0.55)] cursor-default transition-all hover:border-[rgba(0,255,135,0.35)] hover:text-[#00FF87]"
-                      style={{ fontFamily: "'DM Mono', monospace" }}
+                      className="inline-block rounded-xl border border-[rgba(0,255,135,0.2)] bg-[rgba(0,255,135,0.05)] px-3 py-1.5 text-xs font-medium cursor-default transition-all hover:border-[rgba(0,255,135,0.45)] hover:text-[#00FF87]"
+                      style={{ fontFamily: "'DM Mono', monospace", color: "rgba(0,255,135,0.78)" }}
                     >
                       {t}
                     </motion.span>
@@ -206,7 +206,6 @@ const AboutSection = () => {
         </div>
       </section>
 
-      {/* Lightbox */}
       <AnimatePresence>
         {lightbox && about.avatar && (
           <motion.div

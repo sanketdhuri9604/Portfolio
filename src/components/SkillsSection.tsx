@@ -39,7 +39,7 @@ const SkillsSection = () => {
                   </motion.span>
                   <div>
                     <h3 className="font-bold text-[rgba(255,255,255,0.85)] text-sm" style={{ fontFamily: "'Syne', sans-serif" }}>{cat.title}</h3>
-                    <p className="text-xs text-[rgba(255,255,255,0.3)]">{cat.desc}</p>
+                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.58)" }}>{cat.desc}</p>
                   </div>
                 </div>
                 <div className="mb-5 h-px" style={{ background: `linear-gradient(90deg, ${cat.color}30, transparent)` }} aria-hidden="true" />
@@ -47,7 +47,7 @@ const SkillsSection = () => {
                   {cat.skills.map((s) => (
                     <motion.li key={s} whileHover={{ scale: 1.06 }}>
                       <span
-                        className="inline-block rounded-xl border border-[rgba(0,255,135,0.1)] bg-[rgba(0,255,135,0.03)] px-3 py-1.5 text-xs font-medium text-[rgba(0,255,135,0.45)] cursor-default transition-all hover:border-[rgba(0,255,135,0.3)] hover:text-[#00FF87]"
+                        className="inline-block rounded-xl border border-[rgba(0,255,135,0.2)] bg-[rgba(0,255,135,0.04)] px-3 py-1.5 text-xs font-medium cursor-default transition-all hover:border-[rgba(0,255,135,0.4)] hover:text-[#00FF87]" style={{ color: "rgba(0,255,135,0.78)" }}
                         style={{ fontFamily: "'DM Mono', monospace" }}
                       >{s}</span>
                     </motion.li>

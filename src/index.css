@@ -198,7 +198,7 @@
   .mono-label {
     font-family: 'DM Mono', monospace;
     font-size: 9px; letter-spacing: 0.18em;
-    text-transform: uppercase; color: hsl(var(--muted-foreground));
+    text-transform: uppercase; color: rgba(255,255,255,0.5);
   }
   .h-rule {
     height: 1px;
