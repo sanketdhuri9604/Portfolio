@@ -7,6 +7,7 @@ export interface Project {
   num: string;
   title: string;
   description: string;
+  longDescription?: string;
   tags: string[];
   filters: ("Web" | "AI/ML" | "Mobile" | "Backend")[];
   year: string;
@@ -15,7 +16,6 @@ export interface Project {
   githubUrl?: string;
   image: string;
   images?: string[];
-  longDescription?: string;
   accent: string;
 }
 
@@ -43,12 +43,12 @@ export interface PortfolioData {
     name: string;
     firstName: string;
     tagline: string;
+    taglineSuffix?: string;
     subtitle: string;
     badge: string;
     githubUrl: string;
     linkedinUrl: string;
     resumeUrl: string;
-    taglineSuffix?: string;
   };
   about: {
     bio: string;
@@ -207,7 +207,19 @@ export const defaultData: PortfolioData = {
 // ── Storage Key ───────────────────────────────────────────────────────────────
 const STORAGE_KEY = "portfolio_data_v1";
 
-// ── Load from Supabase (cross-device) ─────────────────────────────────────────
+// ── Deep merge — nested objects properly override defaultData ─────────────────
+function deepMerge(base: PortfolioData, override: Partial<PortfolioData>): PortfolioData {
+  return {
+    hero:        { ...base.hero,    ...(override.hero    ?? {}) },
+    about:       { ...base.about,   ...(override.about   ?? {}) },
+    contact:     { ...base.contact, ...(override.contact ?? {}) },
+    projects:    override.projects    ?? base.projects,
+    experiences: override.experiences ?? base.experiences,
+    skills:      override.skills      ?? base.skills,
+  };
+}
+
+// ── Load from Supabase — always preferred, localStorage only as fallback ───────
 export async function loadDataAsync(): Promise<PortfolioData> {
   try {
     const { data, error } = await supabase
@@ -216,21 +228,22 @@ export async function loadDataAsync(): Promise<PortfolioData> {
       .eq("id", "main")
       .single();
 
-    if (error || !data) throw new Error("No data");
+    if (error || !data) throw new Error("No data in Supabase");
 
-    const parsed = data.data as PortfolioData;
-    // Cache locally for instant next load
+    const parsed = data.data as Partial<PortfolioData>;
+
+    // Always overwrite localStorage with latest from Supabase
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); } catch { /* ignore */ }
-    return { ...defaultData, ...parsed };
+
+    return deepMerge(defaultData, parsed);
   } catch {
-    // Fallback to localStorage cache
+    // Supabase unreachable — use localStorage cache
     return loadData();
   }
 }
 
-// ── Save to Supabase (cross-device) ───────────────────────────────────────────
+// ── Save to Supabase + localStorage ──────────────────────────────────────────
 export async function saveDataAsync(data: PortfolioData): Promise<void> {
-  // Save to localStorage instantly
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch { /* ignore */ }
 
   const { error } = await supabase
@@ -240,11 +253,11 @@ export async function saveDataAsync(data: PortfolioData): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
-// ── Sync localStorage helpers ─────────────────────────────────────────────────
+// ── localStorage helpers ──────────────────────────────────────────────────────
 export function loadData(): PortfolioData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return { ...defaultData, ...JSON.parse(raw) };
+    if (raw) return deepMerge(defaultData, JSON.parse(raw));
   } catch { /* ignore */ }
   return defaultData;
 }
