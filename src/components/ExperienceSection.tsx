@@ -51,8 +51,8 @@ const ExperienceSection = () => {
                       {exp.current && <span className="h-2 w-2 rounded-full animate-pulse" style={{ background: "#00FF87" }} />}
                     </div>
                     <div className="pl-7 md:pl-0">
-                      <p className="text-[11px] leading-relaxed" style={{ fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.55)" }}>{exp.duration}</p>
-                      <p className="text-[11px]" style={{ fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.45)" }}>{exp.location}</p>
+                      <p className="text-[11px] leading-relaxed" style={{ fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.78)" }}>{exp.duration}</p>
+                      <p className="text-[11px]" style={{ fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.72)" }}>{exp.location}</p>
                     </div>
                   </div>
 
@@ -90,11 +90,11 @@ const ExperienceSection = () => {
                       </div>
                     </div>
 
-                    <p className="mb-4 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.68)" }}>{exp.description}</p>
+                    <p className="mb-4 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.88)" }}>{exp.description}</p>
 
                     <ul className="space-y-2">
                       {exp.highlights.filter(Boolean).map((pt, j) => (
-                        <li key={j} className="flex items-start gap-2.5 text-sm" style={{ color: "rgba(255,255,255,0.72)" }}>
+                        <li key={j} className="flex items-start gap-2.5 text-sm" style={{ color: "rgba(255,255,255,0.88)" }}>
                           <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: "#00FF87" }} aria-hidden="true" />
                           {pt}
                         </li>

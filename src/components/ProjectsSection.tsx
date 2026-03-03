@@ -98,11 +98,11 @@ const ProjectModal = ({ p, onClose }: { p: Project; onClose: () => void }) => {
                     <Star className="h-3 w-3" /> Featured
                   </span>
                 )}
-                <span className="text-xs" style={{ fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.52)" }}>{p.year}</span>
+                <span className="text-xs" style={{ fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.75)" }}>{p.year}</span>
                 <span className="text-xs" style={{ fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.4)" }}>{p.num}</span>
               </div>
               <h2 className="text-3xl font-black text-gradient mb-3" style={{ fontFamily: "'Syne', sans-serif" }}>{p.title}</h2>
-              <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.72)" }}>{p.longDescription || p.description}</p>
+              <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.88)" }}>{p.longDescription || p.description}</p>
             </div>
             <ImageGallery images={images} />
             <div>
@@ -111,7 +111,7 @@ const ProjectModal = ({ p, onClose }: { p: Project; onClose: () => void }) => {
                 {p.tags.map(t => (
                   <span
                     key={t}
-                    className="rounded-xl border border-[rgba(0,255,135,0.2)] bg-[rgba(0,255,135,0.04)] px-3 py-1.5 text-xs font-medium hover:border-[rgba(0,255,135,0.4)] hover:text-[#00FF87] transition-colors" style={{ color: "rgba(0,255,135,0.78)" }}
+                    className="rounded-xl border border-[rgba(0,255,135,0.2)] bg-[rgba(0,255,135,0.04)] px-3 py-1.5 text-xs font-medium hover:border-[rgba(0,255,135,0.4)] hover:text-[#00FF87] transition-colors" style={{ color: "rgba(0,255,135,0.92)" }}
                     style={{ fontFamily: "'DM Mono', monospace" }}
                   >{t}</span>
                 ))}
@@ -128,7 +128,7 @@ const ProjectModal = ({ p, onClose }: { p: Project; onClose: () => void }) => {
               )}
               {p.githubUrl && p.githubUrl !== "#" && (
                 <a href={p.githubUrl} target="_blank" rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-[rgba(255,255,255,0.08)] py-3 text-sm font-medium text-[rgba(255,255,255,0.55)] hover:border-[rgba(0,255,135,0.3)] hover:text-[#00FF87] transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-[rgba(255,255,255,0.08)] py-3 text-sm font-medium text-[rgba(255,255,255,0.78)] hover:border-[rgba(0,255,135,0.3)] hover:text-[#00FF87] transition-all"
                 >
                   <Github className="h-4 w-4" /> View Code
                 </a>
@@ -163,14 +163,14 @@ const FeaturedCard = ({ p, onClick }: { p: Project; onClick: () => void }) => (
           <span className="flex items-center gap-1.5 rounded-xl bg-[rgba(0,255,135,0.08)] border border-[rgba(0,255,135,0.2)] px-3 py-1 text-[11px] font-medium" style={{ color: "#00FF87", fontFamily: "'DM Mono', monospace" }}>
             <Star className="h-3 w-3" /> Featured
           </span>
-          <span className="text-xs" style={{ fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.52)" }}>{p.year}</span>
+          <span className="text-xs" style={{ fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.75)" }}>{p.year}</span>
           <span className="text-xs" style={{ fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.4)" }}>{p.num}</span>
         </div>
         <h3 className="mb-3 text-2xl font-bold text-[rgba(255,255,255,0.85)] group-hover:text-gradient transition-all" style={{ fontFamily: "'Syne', sans-serif" }}>{p.title}</h3>
-        <p className="mb-5 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>{p.description}</p>
+        <p className="mb-5 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.85)" }}>{p.description}</p>
         <div className="mb-6 flex flex-wrap gap-2">
           {p.tags.map(t => (
-            <span key={t} className="rounded-xl border border-[rgba(0,255,135,0.2)] px-3 py-1 text-xs" style={{ color: "rgba(0,255,135,0.72)" }} style={{ fontFamily: "'DM Mono', monospace" }}>{t}</span>
+            <span key={t} className="rounded-xl border border-[rgba(0,255,135,0.2)] px-3 py-1 text-xs" style={{ color: "rgba(0,255,135,0.88)" }} style={{ fontFamily: "'DM Mono', monospace" }}>{t}</span>
           ))}
         </div>
         <span className="inline-flex items-center gap-1.5 text-sm font-medium" style={{ color: "#00FF87", fontFamily: "'DM Mono', monospace" }}>
@@ -197,20 +197,20 @@ const SmallCard = ({ p, i, onClick }: { p: Project; i: number; onClick: () => vo
       <div className="relative h-40 overflow-hidden">
         <img src={p.image} alt={p.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
         <div className="absolute inset-0 bg-gradient-to-t from-[hsl(140_20%_5%)] to-transparent" />
-        <span className="absolute bottom-3 left-4 text-xs" style={{ color: "rgba(255,255,255,0.55)" }} style={{ fontFamily: "'DM Mono', monospace" }}>{p.num}</span>
+        <span className="absolute bottom-3 left-4 text-xs" style={{ color: "rgba(255,255,255,0.78)" }} style={{ fontFamily: "'DM Mono', monospace" }}>{p.num}</span>
       </div>
       <div className="p-6">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-xs" style={{ fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.52)" }}>{p.year}</span>
+          <span className="text-xs" style={{ fontFamily: "'DM Mono', monospace", color: "rgba(255,255,255,0.75)" }}>{p.year}</span>
           <span className="h-7 w-7 flex items-center justify-center rounded-xl border border-[rgba(255,255,255,0.07)] text-[rgba(255,255,255,0.3)] group-hover:border-[rgba(0,255,135,0.3)] group-hover:text-[#00FF87] transition-all">
             <ArrowUpRight className="h-3.5 w-3.5" />
           </span>
         </div>
         <h3 className="mb-2 text-lg font-bold text-[rgba(255,255,255,0.8)]" style={{ fontFamily: "'Syne', sans-serif" }}>{p.title}</h3>
-        <p className="mb-4 text-xs leading-relaxed line-clamp-2" style={{ color: "rgba(255,255,255,0.62)" }}>{p.description}</p>
+        <p className="mb-4 text-xs leading-relaxed line-clamp-2" style={{ color: "rgba(255,255,255,0.82)" }}>{p.description}</p>
         <div className="flex flex-wrap gap-1.5">
           {p.tags.slice(0, 3).map(t => (
-            <span key={t} className="rounded-xl border border-[rgba(0,255,135,0.2)] px-2.5 py-1 text-[10px]" style={{ color: "rgba(0,255,135,0.72)" }} style={{ fontFamily: "'DM Mono', monospace" }}>{t}</span>
+            <span key={t} className="rounded-xl border border-[rgba(0,255,135,0.2)] px-2.5 py-1 text-[10px]" style={{ color: "rgba(0,255,135,0.88)" }} style={{ fontFamily: "'DM Mono', monospace" }}>{t}</span>
           ))}
         </div>
       </div>
@@ -264,7 +264,7 @@ const ProjectsSection = () => {
               href={data.contact.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm hover:text-[#00FF87] transition-colors link-anim" style={{ color: "rgba(255,255,255,0.52)" }}
+              className="inline-flex items-center gap-2 text-sm hover:text-[#00FF87] transition-colors link-anim" style={{ color: "rgba(255,255,255,0.75)" }}
               style={{ fontFamily: "'DM Mono', monospace" }}
             >
               <Github className="h-4 w-4" /> More on GitHub

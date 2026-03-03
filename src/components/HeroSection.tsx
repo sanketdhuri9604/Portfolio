@@ -54,11 +54,11 @@ const HeroSection = () => {
         />
 
         {/* HUD corners */}
-        <div aria-hidden="true" className="pointer-events-none absolute top-20 left-6 select-none" style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", color: "rgba(0,255,135,0.55)", lineHeight: 1.9 }}>
+        <div aria-hidden="true" className="pointer-events-none absolute top-20 left-6 select-none" style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", color: "rgba(0,255,135,0.85)", lineHeight: 1.9 }}>
           <div>// SD_PORTFOLIO</div>
           <div>STATUS: ACTIVE</div>
         </div>
-        <div aria-hidden="true" className="pointer-events-none absolute top-20 right-6 text-right select-none" style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", color: "rgba(0,255,135,0.55)", lineHeight: 1.9 }}>
+        <div aria-hidden="true" className="pointer-events-none absolute top-20 right-6 text-right select-none" style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.15em", color: "rgba(0,255,135,0.85)", lineHeight: 1.9 }}>
           <div>MUMBAI · IN</div>
           <div>FULLSTACK · AI/ML</div>
         </div>
@@ -122,7 +122,7 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.6 }}
             className="mb-10 max-w-lg text-base leading-relaxed"
-            style={{ color: "rgba(255,255,255,0.65)", fontFamily: "'DM Sans', sans-serif", fontWeight: 300 }}
+            style={{ color: "rgba(255,255,255,0.85)", fontFamily: "'DM Sans', sans-serif", fontWeight: 300 }}
           >
             {hero.subtitle}
           </motion.p>
@@ -174,7 +174,7 @@ const HeroSection = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
           className="absolute bottom-8 left-6 flex items-center gap-3"
-          style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.18em", color: "rgba(0,255,135,0.55)" }}
+          style={{ fontFamily: "'DM Mono', monospace", fontSize: "9px", letterSpacing: "0.18em", color: "rgba(0,255,135,0.85)" }}
         >
           <span className="w-8 h-px bg-gradient-to-r from-[#00FF87] to-transparent" />
           SCROLL_TO_EXPLORE
