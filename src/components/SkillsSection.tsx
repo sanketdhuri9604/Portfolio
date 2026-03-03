@@ -62,4 +62,4 @@ const SkillsSection = () => {
   );
 };
 
-export { SkillsSection };
+export default SkillsSection;

@@ -1,8 +1,6 @@
-import React from "react";
-
 // Skeleton Loading Screen — shown while Supabase data loads
-const SkeletonBlock = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
-  <div className={`skeleton ${className ?? ""}`} style={style} />
+const SkeletonBlock = ({ className }: { className?: string }) => (
+  <div className={`skeleton ${className ?? ""}`} />
 );
 
 const SkeletonLoader = () => (
@@ -23,7 +21,7 @@ const SkeletonLoader = () => (
       <SkeletonBlock className="h-9 w-9 rounded-xl" />
       <div className="hidden md:flex gap-2">
         {[60, 50, 60, 72, 56].map((w, i) => (
-          <SkeletonBlock key={i} className="h-8 rounded-xl" style={{ width: w }} />
+          <div key={i} className="skeleton h-8 rounded-xl" style={{ width: w + "px" }} />
         ))}
       </div>
     </div>
