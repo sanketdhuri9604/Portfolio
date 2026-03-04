@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
 import { loadDataAsync, saveDataAsync, defaultData } from "@/portfolioData";
 import type { PortfolioData } from "@/portfolioData";
@@ -10,44 +10,61 @@ interface PortfolioContextType {
   isSyncing: boolean;
   isSaving: boolean;
   isLoading: boolean;
+  networkError: boolean;
+  retry: () => void;
 }
 
 export const PortfolioContext = createContext<PortfolioContextType | null>(null);
 
 function PortfolioProvider({ children }: { children: ReactNode }) {
-  // Start with defaultData (not localStorage) — nothing renders until Supabase responds
   const [data, setDataState] = useState<PortfolioData>(defaultData);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // ← skeleton shown until this is false
+  const [isLoading, setIsLoading] = useState(true);
+  const [networkError, setNetworkError] = useState(false);
 
-  useEffect(() => {
+  const fetchData = useCallback(async (showSkeleton = false) => {
+    if (showSkeleton) setIsLoading(true);
+    setNetworkError(false);
+
     const timeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("timeout")), 5000)
+      setTimeout(() => reject(new Error("timeout")), 10000)
     );
 
-    Promise.race([loadDataAsync(), timeout])
-      .then(async (latest) => {
-        const d = latest as PortfolioData;
-        if (d.about?.avatar) {
-          await new Promise<void>((resolve) => {
-            const img = new window.Image();
-            img.onload = () => resolve();
-            img.onerror = () => resolve();
-            img.src = d.about.avatar!;
-          });
-        }
-        setDataState(d);
-        document.title = `Sanket's Portfolio`;
-      })
-      .catch(() => {
-        console.warn("Supabase unavailable, using default data");
-      })
-      .finally(() => {
-        setIsLoading(false); // ← skeleton hatao, real data dikhaao
-        setIsSyncing(false);
-      });
+    try {
+      const latest = await Promise.race([loadDataAsync(), timeout]);
+      const d = latest as PortfolioData;
+
+      if (d.about?.avatar) {
+        await new Promise<void>((resolve) => {
+          const img = new window.Image();
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+          img.src = d.about.avatar!;
+        });
+      }
+
+      setDataState(d);
+      setNetworkError(false);
+      document.title = `Sanket's Portfolio`;
+    } catch {
+      console.warn("Supabase unavailable");
+      setNetworkError(true); // ← toast dikhao
+    } finally {
+      setIsLoading(false);
+      setIsSyncing(false);
+    }
   }, []);
+
+  // Initial load
+  useEffect(() => {
+    fetchData(true);
+  }, [fetchData]);
+
+  // Retry function — user RETRY click kare toh call hoga
+  const retry = useCallback(() => {
+    fetchData(false); // skeleton nahi, sirf toast update hoga
+  }, [fetchData]);
 
   const setData = (d: PortfolioData) => setDataState(d);
 
@@ -65,7 +82,7 @@ function PortfolioProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <PortfolioContext.Provider value={{ data, setData, save, isSyncing, isSaving, isLoading }}>
+    <PortfolioContext.Provider value={{ data, setData, save, isSyncing, isSaving, isLoading, networkError, retry }}>
       {children}
     </PortfolioContext.Provider>
   );

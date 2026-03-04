@@ -37,7 +37,7 @@ const HeroSection = () => {
   return (
     <>
       <section
-        className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden px-6 pt-24 pb-16 mesh-hero noise"
+        className="relative flex min-h-screen flex-col justify-center overflow-hidden px-6 pt-24 pb-16 mesh-hero noise"
         aria-labelledby="hero-heading"
       >
         <ParticleCanvas />

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { supabase } from "./supabaseClient";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -173,6 +173,218 @@ const MultiImageUpload = ({ onAdd }: { onAdd: (base64: string) => void }) => {
         </div>
       </div>
     </div>
+  );
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// GLITCH RESET MODAL
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+const GLITCH_CHARS = "!@#$%^&*<>?/|\\[]{}~`ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+const GlitchText = ({ text, active }: { text: string; active: boolean }) => {
+  const [display, setDisplay] = useState(text);
+  useEffect(() => {
+    if (!active) { setDisplay(text); return; }
+    let iteration = 0;
+    const interval = setInterval(() => {
+      setDisplay(text.split("").map((char, i) => {
+        if (char === " ") return " ";
+        if (i < iteration) return text[i];
+        return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+      }).join(""));
+      if (iteration >= text.length) clearInterval(interval);
+      iteration += 0.4;
+    }, 28);
+    return () => clearInterval(interval);
+  }, [active, text]);
+  return <span>{display}</span>;
+};
+
+const TypewriterLine = ({ text, delay, color }: { text: string; delay: number; color: string }) => {
+  const [displayed, setDisplayed] = useState("");
+  useEffect(() => {
+    let i = 0;
+    const t = setTimeout(() => {
+      const iv = setInterval(() => {
+        i++;
+        setDisplayed(text.slice(0, i));
+        if (i >= text.length) clearInterval(iv);
+      }, 22);
+      return () => clearInterval(iv);
+    }, delay);
+    return () => clearTimeout(t);
+  }, [text, delay]);
+  return (
+    <div style={{ color, marginBottom: "4px", fontSize: "11px", letterSpacing: "0.04em", fontFamily: "'DM Mono', monospace" }}>
+      {displayed}<span style={{ opacity: displayed.length < text.length ? 1 : 0 }}>_</span>
+    </div>
+  );
+};
+
+const TERMINAL_LINES = [
+  { text: "> INITIATING RESET PROTOCOL...", color: "rgba(0,255,135,0.7)" },
+  { text: "> SCANNING DATA STRUCTURES...", color: "rgba(0,255,135,0.7)" },
+  { text: "> WARNING: ALL DATA WILL BE WIPED", color: "#ff6b6b" },
+  { text: "> OVERWRITING WITH DEFAULT CONFIG...", color: "rgba(0,255,135,0.7)" },
+  { text: "> RESET COMPLETE. SAVE TO APPLY.", color: "#00FF87" },
+];
+
+const GlitchResetModal = ({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) => {
+  const [glitchActive, setGlitchActive] = useState(false);
+  const [phase, setPhase] = useState<"confirm" | "executing">("confirm");
+  const [holdProgress, setHoldProgress] = useState(0);
+  const [holding, setHolding] = useState(false);
+  const [glitchScreen, setGlitchScreen] = useState(false);
+  const holdRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    setTimeout(() => setGlitchActive(true), 80);
+    setTimeout(() => setGlitchActive(false), 1400);
+  }, []);
+
+  const startHold = () => {
+    setHolding(true);
+    let p = 0;
+    holdRef.current = setInterval(() => {
+      p += 2.5;
+      setHoldProgress(p);
+      if (p >= 100) {
+        clearInterval(holdRef.current!);
+        setHolding(false);
+        setPhase("executing");
+        setGlitchScreen(true);
+        setTimeout(() => setGlitchScreen(false), 300);
+        setTimeout(() => onConfirm(), TERMINAL_LINES.length * 400 + 800);
+      }
+    }, 30);
+  };
+
+  const stopHold = () => {
+    if (holdRef.current) clearInterval(holdRef.current);
+    setHolding(false);
+    setHoldProgress(0);
+  };
+
+  return (
+    <>
+      <style>{`
+        @keyframes glitch-flash { 0%{clip-path:inset(20% 0 60% 0)} 20%{clip-path:inset(50% 0 20% 0)} 40%{clip-path:inset(10% 0 80% 0)} 60%{clip-path:inset(70% 0 10% 0)} 80%{clip-path:inset(30% 0 50% 0)} 100%{clip-path:inset(0 0 0 0)} }
+        @keyframes scanline-move { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
+        @keyframes rgb-shift { 0%{text-shadow:2px 0 #ff003c,-2px 0 #00FF87} 25%{text-shadow:-2px 0 #ff003c,2px 0 #00FF87} 50%{text-shadow:2px 2px #ff003c,-2px -2px #00FF87} 75%{text-shadow:-2px 2px #ff003c,2px -2px #00FF87} 100%{text-shadow:2px 0 #ff003c,-2px 0 #00FF87} }
+        @keyframes red-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,0,60,0)} 50%{box-shadow:0 0 20px 4px rgba(255,0,60,0.3)} }
+        @keyframes cursor-blink { 0%,100%{opacity:1} 50%{opacity:0} }
+      `}</style>
+
+      {/* Glitch screen flash */}
+      {glitchScreen && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(255,0,60,0.15)", animation: "glitch-flash 0.3s steps(1) forwards", pointerEvents: "none" }} />
+      )}
+
+      {/* Backdrop */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[150] bg-black/85 backdrop-blur-sm"
+        onClick={() => phase === "confirm" && onCancel()}
+      />
+
+      {/* Scanline */}
+      <div style={{ position: "fixed", inset: 0, zIndex: 151, overflow: "hidden", pointerEvents: "none" }}>
+        <div style={{ position: "absolute", left: 0, right: 0, height: "2px", background: "linear-gradient(90deg, transparent, rgba(255,0,60,0.25), transparent)", animation: "scanline-move 3s linear infinite" }} />
+      </div>
+
+      {/* Modal */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        className="fixed inset-0 z-[152] flex items-center justify-center p-6"
+        style={{ pointerEvents: "none" }}
+      >
+        <div style={{
+          width: "100%", maxWidth: "400px", borderRadius: "16px",
+          border: `1px solid ${phase === "executing" ? "rgba(255,0,60,0.4)" : "rgba(255,0,60,0.2)"}`,
+          background: "hsl(140,25%,4%)", overflow: "hidden",
+          boxShadow: "0 0 60px rgba(255,0,60,0.1), 0 24px 80px rgba(0,0,0,0.8)",
+          position: "relative", pointerEvents: "all",
+          transition: "border-color 0.3s",
+        }}>
+          {/* Scanlines overlay */}
+          <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 10, backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)" }} />
+
+          {/* Top bar */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px", borderBottom: "1px solid rgba(255,0,60,0.1)", background: "rgba(255,0,60,0.04)" }}>
+            <div style={{ display: "flex", gap: "6px" }}>
+              {["#ff5f57", "#febc2e", "#28c840"].map((c, i) => (
+                <div key={i} style={{ width: "10px", height: "10px", borderRadius: "50%", background: c, opacity: 0.7 }} />
+              ))}
+            </div>
+            <span style={{ fontSize: "10px", color: "rgba(255,0,60,0.6)", letterSpacing: "0.15em", fontFamily: "'DM Mono', monospace" }}>RESET_PROTOCOL.exe</span>
+            {phase === "confirm" && (
+              <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.2)", cursor: "pointer" }} onClick={onCancel}>✕</span>
+            )}
+          </div>
+
+          <div style={{ padding: "24px" }}>
+            {phase === "confirm" && (
+              <>
+                {/* Warning icon */}
+                <div style={{ textAlign: "center", marginBottom: "20px" }}>
+                  <div style={{ fontSize: "36px", lineHeight: 1, animation: glitchActive ? "rgb-shift 0.1s steps(1) infinite" : "none" }}>⚠</div>
+                  <div style={{ marginTop: "12px", fontSize: "16px", fontWeight: 700, color: "rgba(255,255,255,0.88)", fontFamily: "'Syne', sans-serif" }}>
+                    <GlitchText text="RESET_ALL_DATA ?" active={glitchActive} />
+                  </div>
+                </div>
+
+                {/* Warning box */}
+                <div style={{ background: "rgba(255,0,60,0.05)", border: "1px solid rgba(255,0,60,0.15)", borderRadius: "10px", padding: "12px 14px", marginBottom: "20px", fontSize: "11px", color: "rgba(255,255,255,0.4)", lineHeight: 1.8, letterSpacing: "0.03em", fontFamily: "'DM Mono', monospace" }}>
+                  <span style={{ color: "#ff6b6b" }}>// WARNING:</span> This will overwrite all<br />
+                  portfolio content with placeholder data.<br />
+                  <span style={{ color: "rgba(0,255,135,0.7)" }}>// NOTE:</span> Live site unchanged until saved.
+                </div>
+
+                {/* Hold to confirm */}
+                <div style={{ marginBottom: "12px" }}>
+                  <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.2)", marginBottom: "6px", letterSpacing: "0.12em", textAlign: "center", fontFamily: "'DM Mono', monospace" }}>
+                    {holding ? `HOLD... ${Math.floor(holdProgress)}%` : "HOLD TO CONFIRM RESET"}
+                  </div>
+                  <div style={{ height: "2px", background: "rgba(255,0,60,0.1)", borderRadius: "2px", marginBottom: "8px", overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${holdProgress}%`, background: "linear-gradient(90deg, #ff003c, #ff6b6b)", boxShadow: "0 0 8px #ff003c", transition: "width 0.03s linear", borderRadius: "2px" }} />
+                  </div>
+                  <button
+                    onMouseDown={startHold} onMouseUp={stopHold} onMouseLeave={stopHold}
+                    onTouchStart={startHold} onTouchEnd={stopHold}
+                    style={{ width: "100%", padding: "12px", borderRadius: "10px", border: `1px solid ${holding ? "rgba(255,0,60,0.5)" : "rgba(255,0,60,0.25)"}`, background: holding ? "rgba(255,0,60,0.12)" : "rgba(255,0,60,0.06)", color: holding ? "#ff6b6b" : "rgba(255,100,100,0.6)", fontSize: "11px", fontWeight: 500, cursor: "pointer", letterSpacing: "0.1em", transition: "all 0.15s", animation: holding ? "red-pulse 0.8s infinite" : "none", userSelect: "none", fontFamily: "'DM Mono', monospace" }}
+                  >
+                    {holding ? "▮▮▮ RESETTING... ▮▮▮" : "⬛ HOLD TO RESET"}
+                  </button>
+                </div>
+
+                <button onClick={onCancel} style={{ width: "100%", padding: "10px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.06)", background: "transparent", color: "rgba(255,255,255,0.2)", fontSize: "11px", cursor: "pointer", letterSpacing: "0.1em", fontFamily: "'DM Mono', monospace", transition: "all 0.2s" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.5)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.12)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.2)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.06)"; }}
+                >
+                  ABORT
+                </button>
+              </>
+            )}
+
+            {phase === "executing" && (
+              <div style={{ padding: "4px 0" }}>
+                <div style={{ fontSize: "10px", color: "rgba(255,0,60,0.6)", marginBottom: "14px", letterSpacing: "0.12em", fontFamily: "'DM Mono', monospace" }}>$ EXECUTING RESET...</div>
+                {TERMINAL_LINES.map((line, i) => (
+                  <TypewriterLine key={i} text={line.text} delay={i * 400} color={line.color} />
+                ))}
+                <div style={{ marginTop: "14px", height: "1px", background: "rgba(0,255,135,0.1)" }} />
+                <div style={{ marginTop: "10px", fontSize: "10px", color: "rgba(0,255,135,0.4)", fontFamily: "'DM Mono', monospace" }}>
+                  <span style={{ animation: "cursor-blink 0.7s infinite", display: "inline-block" }}>█</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    </>
   );
 };
 
@@ -625,6 +837,7 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
   const [draft, setDraft] = useState<PortfolioData>(JSON.parse(JSON.stringify(data)));
   const [tab, setTab] = useState<Tab>("hero");
   const [notif, setNotif] = useState<{ type: NotifType; msg: string } | null>(null);
+  const [showResetModal, setShowResetModal] = useState(false);
 
   const showNotif = (type: NotifType, msg: string) => {
     setNotif({ type, msg });
@@ -639,7 +852,12 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
       showNotif("error", "Save failed! Check your connection.");
     }
   };
-  const handleReset = () => { setDraft(JSON.parse(JSON.stringify(defaultData))); showNotif("error", "Reset to defaults — save to apply."); };
+
+  const handleResetConfirm = () => {
+    setShowResetModal(false);
+    setDraft(JSON.parse(JSON.stringify(defaultData)));
+    showNotif("error", "Reset to defaults — save to apply.");
+  };
 
   const up: Updater = (section, patch) =>
     setDraft((d: PortfolioData) => ({ ...d, [section]: { ...(d[section] as object), ...(patch as object) } }));
@@ -662,6 +880,15 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
         {notif && <Notif key="notif" type={notif.type} msg={notif.msg} onClose={() => setNotif(null)} />}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {showResetModal && (
+          <GlitchResetModal
+            onConfirm={handleResetConfirm}
+            onCancel={() => setShowResetModal(false)}
+          />
+        )}
+      </AnimatePresence>
+
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
       <motion.aside
@@ -678,12 +905,8 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
             <p className="text-xs text-[rgba(255,255,255,0.2)] mt-0.5">Edit content · Save · See changes instantly</p>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={handleReset} className="flex items-center gap-2 rounded-xl border border-[rgba(255,255,255,0.07)] px-3 py-2 text-xs font-semibold text-[rgba(255,255,255,0.3)] hover:border-[rgba(220,50,50,0.4)] hover:text-[hsl(0_60%_55%)] transition-all">
+            <button onClick={() => setShowResetModal(true)} className="flex items-center gap-2 rounded-xl border border-[rgba(255,255,255,0.07)] px-3 py-2 text-xs font-semibold text-[rgba(255,255,255,0.3)] hover:border-[rgba(220,50,50,0.4)] hover:text-[hsl(0_60%_55%)] transition-all">
               <RotateCcw className="h-3.5 w-3.5" /> Reset
-            </button>
-            <button onClick={handleSave} disabled={isSaving} className="flex items-center gap-2 rounded-xl bg-[#00FF87] px-4 py-2 text-xs font-bold text-[hsl(140_30%_3%)] hover:bg-[#20ffa0] transition-colors shadow-lg shadow-[rgba(0,255,135,0.18)] disabled:opacity-60 disabled:cursor-not-allowed">
-              {isSaving ? <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" /> : <Save className="h-3.5 w-3.5" />}
-              {isSaving ? "Saving..." : "Save Changes"}
             </button>
             <button onClick={onClose} className="p-2 rounded-xl text-[rgba(255,255,255,0.25)] hover:text-[rgba(255,255,255,0.88)] hover:bg-[rgba(255,255,255,0.04)] transition-colors">
               <X className="h-5 w-5" />
