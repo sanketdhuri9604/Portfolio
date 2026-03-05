@@ -7,6 +7,35 @@ import {
   CheckCircle2, AlertCircle, GripVertical, Star, Lock, ShieldCheck
 } from "lucide-react";
 import { usePortfolio } from "./usePortfolio";
+
+// ── Cloudinary Config ─────────────────────────────────────────────────────────
+const CLOUDINARY_CLOUD = "dkpwa8ttf";
+const CLOUDINARY_PRESET = "portfolio_uploads";
+const SUPABASE_URL = "https://lbmwkajwrkcxdowsyotj.supabase.co";
+
+const uploadToCloudinary = async (file: File): Promise<string> => {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", CLOUDINARY_PRESET);
+  fd.append("folder", "portfolio");
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method: "POST", body: fd });
+  const data = await res.json();
+  if (!data.secure_url) throw new Error("Upload failed");
+  return data.secure_url;
+};
+
+const deleteFromCloudinary = async (url: string): Promise<void> => {
+  // Extract public_id from URL
+  const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-z]+$/);
+  if (!match) return;
+  const publicId = match[1];
+  const { data: { session } } = await supabase.auth.getSession();
+  await fetch(`${SUPABASE_URL}/functions/v1/delete-cloudinary-image`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${(await supabase.auth.getSession()).data.session?.access_token ?? ""}` },
+    body: JSON.stringify({ publicId }),
+  });
+};
 import { defaultData } from "./portfolioData";
 import type { PortfolioData, Project, Experience, SkillCategory } from "@/portfolioData";
 
@@ -63,26 +92,44 @@ const TagEditor = ({ tags, onChange }: { tags: string[]; onChange: (t: string[])
   );
 };
 
-// ── Image Upload ──────────────────────────────────────────────────────────────
+// ── Image Upload (Cloudinary) ─────────────────────────────────────────────────
 const ImageUpload = ({
   value,
   onChange,
   label = "Upload Image",
-  hint = "JPG, PNG, WEBP · Max 2MB recommended"
+  hint = "JPG, PNG, WEBP · Max 5MB"
 }: {
   value?: string;
-  onChange: (base64: string) => void;
+  onChange: (url: string) => void;
   label?: string;
   hint?: string;
 }) => {
   const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  const processFile = (file: File) => {
+  const processFile = async (file: File) => {
     if (!file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = e => { if (e.target?.result) onChange(e.target.result as string); };
-    reader.readAsDataURL(file);
+    setUploading(true);
+    try {
+      // Delete old image from Cloudinary if exists
+      if (value && value.includes("cloudinary.com")) {
+        await deleteFromCloudinary(value);
+      }
+      const url = await uploadToCloudinary(file);
+      onChange(url);
+    } catch (e) {
+      console.error("Upload failed:", e);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (value && value.includes("cloudinary.com")) {
+      await deleteFromCloudinary(value);
+    }
+    onChange("");
   };
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,7 +152,7 @@ const ImageUpload = ({
         <div className="relative w-full h-36 rounded-xl overflow-hidden border border-[rgba(0,255,135,0.3)]">
           <img src={value} alt="preview" className="w-full h-full object-cover" />
           <button
-            onClick={() => onChange("")}
+            onClick={handleDelete}
             className="absolute top-2 right-2 flex items-center justify-center h-7 w-7 rounded-lg bg-black/60 text-white hover:bg-black/80 transition-colors"
           >
             <X className="h-3.5 w-3.5" />
@@ -118,21 +165,24 @@ const ImageUpload = ({
 
       {/* Drop zone */}
       <div
-        onClick={() => inputRef.current?.click()}
+        onClick={() => !uploading && inputRef.current?.click()}
         onDragOver={e => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-5 cursor-pointer transition-all ${
-          dragging
-            ? "border-[hsl(152_60%_45%)] bg-[rgba(0,255,135,0.05)]"
-            : "border-[rgba(255,255,255,0.08)] hover:border-[rgba(0,255,135,0.4)] hover:bg-[rgba(0,255,135,0.03)]"
-        }`}
+          dragging ? "border-[hsl(152_60%_45%)] bg-[rgba(0,255,135,0.05)]" : "border-[rgba(255,255,255,0.08)] hover:border-[rgba(0,255,135,0.4)] hover:bg-[rgba(0,255,135,0.03)]"
+        } ${uploading ? "opacity-60 cursor-not-allowed" : ""}`}
       >
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[rgba(0,255,135,0.06)]">
-          <Plus className="h-4 w-4 text-[#00FF87]" />
+          {uploading
+            ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#00FF87] border-t-transparent" />
+            : <Plus className="h-4 w-4 text-[#00FF87]" />
+          }
         </div>
         <div className="text-center">
-          <p className="text-xs font-semibold text-[rgba(255,255,255,0.55)]">{value ? "Change photo" : "Click or drag photo here"}</p>
+          <p className="text-xs font-semibold text-[rgba(255,255,255,0.55)]">
+            {uploading ? "Uploading to Cloudinary..." : value ? "Change photo" : "Click or drag photo here"}
+          </p>
           <p className="text-[10px] text-[rgba(255,255,255,0.2)] mt-0.5">{hint}</p>
         </div>
       </div>
@@ -140,35 +190,47 @@ const ImageUpload = ({
   );
 };
 
-// ── Multi Image Upload ────────────────────────────────────────────────────────
-const MultiImageUpload = ({ onAdd }: { onAdd: (base64: string) => void }) => {
+// ── Multi Image Upload (Cloudinary) ───────────────────────────────────────────
+const MultiImageUpload = ({ onAdd }: { onAdd: (url: string) => void }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
-  const processFiles = (files: FileList) => {
-    Array.from(files).forEach(file => {
-      if (!file.type.startsWith("image/")) return;
-      const reader = new FileReader();
-      reader.onload = e => { if (e.target?.result) onAdd(e.target.result as string); };
-      reader.readAsDataURL(file);
-    });
+  const processFiles = async (files: FileList) => {
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        if (!file.type.startsWith("image/")) continue;
+        const url = await uploadToCloudinary(file);
+        onAdd(url);
+      }
+    } catch (e) {
+      console.error("Upload failed:", e);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
     <div>
       <input ref={inputRef} type="file" accept="image/*" multiple onChange={e => { if (e.target.files) processFiles(e.target.files); e.target.value = ""; }} className="hidden" />
       <div
-        onClick={() => inputRef.current?.click()}
+        onClick={() => !uploading && inputRef.current?.click()}
         onDragOver={e => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={e => { e.preventDefault(); setDragging(false); if (e.dataTransfer.files) processFiles(e.dataTransfer.files); }}
-        className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-4 cursor-pointer transition-all ${dragging ? "border-[hsl(152_60%_45%)] bg-[rgba(0,255,135,0.05)]" : "border-[rgba(255,255,255,0.08)] hover:border-[rgba(0,255,135,0.4)] hover:bg-[rgba(0,255,135,0.03)]"}`}
+        className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-4 cursor-pointer transition-all ${dragging ? "border-[hsl(152_60%_45%)] bg-[rgba(0,255,135,0.05)]" : "border-[rgba(255,255,255,0.08)] hover:border-[rgba(0,255,135,0.4)] hover:bg-[rgba(0,255,135,0.03)]"} ${uploading ? "opacity-60 cursor-not-allowed" : ""}`}
       >
         <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[rgba(0,255,135,0.06)]">
-          <Plus className="h-4 w-4 text-[#00FF87]" />
+          {uploading
+            ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#00FF87] border-t-transparent" />
+            : <Plus className="h-4 w-4 text-[#00FF87]" />
+          }
         </div>
         <div className="text-center">
-          <p className="text-xs font-semibold text-[rgba(255,255,255,0.55)]">Click or drag images here</p>
+          <p className="text-xs font-semibold text-[rgba(255,255,255,0.55)]">
+            {uploading ? "Uploading..." : "Click or drag images here"}
+          </p>
           <p className="text-[10px] text-[rgba(255,255,255,0.2)] mt-0.5">Multiple select supported · JPG, PNG, WEBP</p>
         </div>
       </div>

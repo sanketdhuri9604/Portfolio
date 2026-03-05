@@ -49,19 +49,17 @@ function PortfolioProvider({ children }: { children: ReactNode }) {
       document.title = `Sanket's Portfolio`;
     } catch {
       console.warn("Supabase unavailable");
-      setNetworkError(true); // ← toast dikhao
+      setNetworkError(true);
     } finally {
       setIsLoading(false);
       setIsSyncing(false);
     }
   }, []);
 
-  // Initial load
   useEffect(() => {
     fetchData(true);
   }, [fetchData]);
 
-  // Retry function — user RETRY click kare toh call hoga
   const retry = useCallback(() => {
     window.location.reload();
   }, []);
@@ -73,6 +71,7 @@ function PortfolioProvider({ children }: { children: ReactNode }) {
     setDataState(d);
     try {
       await saveDataAsync(d);
+      await fetchData(false); // ← save ke baad fresh data fetch karo
     } catch (e) {
       console.error("Failed to save to Supabase:", e);
       throw e;
