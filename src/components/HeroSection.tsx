@@ -197,7 +197,7 @@ const HeroSection = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-[rgba(255,255,255,0.07)] text-[rgba(255,255,255,0.5)] transition-all hover:border-[rgba(0,255,135,0.35)] hover:text-[#00FF87] hover:bg-[rgba(0,255,135,0.06)]"
+                  className="social-icon flex h-10 w-10 items-center justify-center rounded-xl border border-[rgba(255,255,255,0.07)] text-[rgba(255,255,255,0.5)] hover:border-[rgba(0,255,135,0.35)] hover:text-[#00FF87] hover:bg-[rgba(0,255,135,0.06)]"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
