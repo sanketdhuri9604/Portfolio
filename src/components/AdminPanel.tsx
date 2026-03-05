@@ -1092,21 +1092,26 @@ if (path !== "/admin") return null;
       </AnimatePresence>
 
       {/* Floating button */}
-      <AnimatePresence>
-        {visible && (
-          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} className="fixed bottom-6 right-6 z-50 flex items-center gap-2">
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleEditClick}
+      <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="fixed bottom-6 right-6 z-50 flex items-center gap-2">
+        <AnimatePresence>
+          {visible && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8, x: 10 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.8, x: 10 }}
+              whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+              onClick={handleEditClick}
               className="flex items-center gap-2.5 rounded-2xl border border-[rgba(0,255,135,0.35)] bg-[rgba(5,15,8,0.95)] px-5 py-3 text-sm font-semibold text-[#00FF87] shadow-2xl shadow-black/50 backdrop-blur-xl hover:border-[rgba(0,255,135,0.5)] hover:bg-[rgba(0,255,135,0.05)] transition-all">
               {authenticated ? <Eye className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
               {authenticated ? "Edit Content" : "Admin"}
             </motion.button>
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setVisible(false)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(5,15,8,0.95)] text-[rgba(255,255,255,0.2)] hover:text-[hsl(150_6%_60%)] backdrop-blur-xl transition-all">
-              <EyeOff className="h-4 w-4" />
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+        <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setVisible(v => !v)}
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-[rgba(255,255,255,0.07)] bg-[rgba(5,15,8,0.95)] text-[rgba(255,255,255,0.2)] hover:text-[hsl(150_6%_60%)] backdrop-blur-xl transition-all">
+          {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </motion.button>
+      </motion.div>
     </>
   );
 };
