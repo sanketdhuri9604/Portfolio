@@ -24,15 +24,15 @@ const uploadToCloudinary = async (file: File): Promise<string> => {
   return data.secure_url;
 };
 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxibXdrYWp3cmtjeGRvd3N5b3RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzODk3NzYsImV4cCI6MjA4Nzk2NTc3Nn0.xoTj0IDL8E6WHNhAnyC8TKNMgIJx9WrfIM4t7vz0Coo";
+
 const deleteFromCloudinary = async (url: string): Promise<void> => {
-  // Extract public_id from URL
   const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.[a-z]+$/);
   if (!match) return;
   const publicId = match[1];
-  const { data: { session } } = await supabase.auth.getSession();
   await fetch(`${SUPABASE_URL}/functions/v1/delete-cloudinary-image`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${(await supabase.auth.getSession()).data.session?.access_token ?? ""}` },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${SUPABASE_ANON_KEY}` },
     body: JSON.stringify({ publicId }),
   });
 };
