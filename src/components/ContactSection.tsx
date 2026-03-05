@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import type { FormEvent } from "react";
 import emailjs from "@emailjs/browser";
 import { motion } from "framer-motion";
@@ -6,6 +6,27 @@ import { Github, Linkedin, Twitter, Instagram, ArrowUpRight, Send, CheckCircle2,
 import { usePortfolio } from "@/usePortfolio";
 
 type FS = "idle" | "loading" | "success";
+
+
+// ── Copy Email Button ─────────────────────────────────────────────────────────
+const CopyEmailBtn = ({ email }: { email: string }) => {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    await navigator.clipboard.writeText(email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button onClick={copy} title="Copy email address" style={{ display:"inline-flex", alignItems:"center", gap:"6px", fontSize:"10px", fontFamily:"'DM Mono', monospace", border:`1px solid ${copied ? "rgba(0,255,135,0.35)" : "rgba(255,255,255,0.07)"}`, borderRadius:"8px", padding:"5px 10px", color:copied ? "#00FF87" : "rgba(255,255,255,0.3)", background:copied ? "rgba(0,255,135,0.05)" : "transparent", cursor:"pointer", letterSpacing:"0.08em", transition:"all 0.2s ease" }}>
+      {copied ? (
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      ) : (
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      )}
+      {copied ? "COPIED!" : email}
+    </button>
+  );
+};
 
 const ContactSection = () => {
   const { data } = usePortfolio();
@@ -166,7 +187,7 @@ const ContactSection = () => {
                     href={href}
                     target={href.startsWith("mailto") ? undefined : "_blank"}
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-[rgba(255,255,255,0.82)] transition-all hover:bg-[rgba(0,255,135,0.05)] hover:text-[rgba(255,255,255,0.85)] group"
+                    className="social-icon flex items-center justify-between rounded-xl px-3 py-2.5 text-sm text-[rgba(255,255,255,0.82)] hover:bg-[rgba(0,255,135,0.05)] hover:text-[rgba(255,255,255,0.85)] group"
                   >
                     <div className="flex items-center gap-3">
                       <Icon className="h-4 w-4 group-hover:text-[#00FF87] transition-colors" />
@@ -190,10 +211,13 @@ const ContactSection = () => {
           style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
           role="contentinfo"
         >
-          <p className="text-sm text-[rgba(255,255,255,0.72)]">
-            © {contact.footerYear}{" "}
-            <span className="text-[rgba(255,255,255,0.5)] font-medium">{contact.footerName}</span>. Built with passion &amp; clean code.
-          </p>
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-[rgba(255,255,255,0.72)]">
+              © {contact.footerYear}{" "}
+              <span className="text-[rgba(255,255,255,0.5)] font-medium">{contact.footerName}</span>. Built with passion &amp; clean code.
+            </p>
+            <CopyEmailBtn email={contact.email} />
+          </div>
           <p className="text-xs text-[rgba(255,255,255,0.65)]">Made in Mumbai 🇮🇳</p>
         </motion.footer>
       </div>

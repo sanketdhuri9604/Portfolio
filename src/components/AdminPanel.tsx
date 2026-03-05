@@ -96,11 +96,13 @@ const TagEditor = ({ tags, onChange }: { tags: string[]; onChange: (t: string[])
 const ImageUpload = ({
   value,
   onChange,
+  onUploaded,
   label = "Upload Image",
   hint = "JPG, PNG, WEBP · Max 5MB"
 }: {
   value?: string;
   onChange: (url: string) => void;
+  onUploaded?: (url: string) => void;
   label?: string;
   hint?: string;
 }) => {
@@ -112,12 +114,12 @@ const ImageUpload = ({
     if (!file.type.startsWith("image/")) return;
     setUploading(true);
     try {
-      // Delete old image from Cloudinary if exists
       if (value && value.includes("cloudinary.com")) {
         await deleteFromCloudinary(value);
       }
       const url = await uploadToCloudinary(file);
       onChange(url);
+      onUploaded?.(url); // track for cleanup
     } catch (e) {
       console.error("Upload failed:", e);
     } finally {
@@ -191,7 +193,7 @@ const ImageUpload = ({
 };
 
 // ── Multi Image Upload (Cloudinary) ───────────────────────────────────────────
-const MultiImageUpload = ({ onAdd }: { onAdd: (url: string) => void }) => {
+const MultiImageUpload = ({ onAdd, onUploaded }: { onAdd: (url: string) => void; onUploaded?: (url: string) => void }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -203,6 +205,7 @@ const MultiImageUpload = ({ onAdd }: { onAdd: (url: string) => void }) => {
         if (!file.type.startsWith("image/")) continue;
         const url = await uploadToCloudinary(file);
         onAdd(url);
+        onUploaded?.(url); // track for cleanup
       }
     } catch (e) {
       console.error("Upload failed:", e);
@@ -468,7 +471,7 @@ const Notif = ({ type, msg, onClose }: { type: NotifType; msg: string; onClose: 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 type Updater = <K extends keyof PortfolioData>(section: K, patch: Partial<PortfolioData[K]>) => void;
-interface TabProps { draft: PortfolioData; setDraft: React.Dispatch<React.SetStateAction<PortfolioData>>; up: Updater; }
+interface TabProps { draft: PortfolioData; setDraft: React.Dispatch<React.SetStateAction<PortfolioData>>; up: Updater; trackUpload?: (url: string) => void; }
 
 // ── Hero Tab ─────────────────────────────────────────────────────────────────
 const HeroTab = ({ draft, up }: TabProps) => (
@@ -491,12 +494,13 @@ const HeroTab = ({ draft, up }: TabProps) => (
 
 
 // ── About Tab ────────────────────────────────────────────────────────────────
-const AboutTab = ({ draft, up }: TabProps) => (
+const AboutTab = ({ draft, up, trackUpload }: TabProps) => (
   <div className="space-y-4">
     <SectionCard title="Profile Photo">
       <ImageUpload
         value={draft.about.avatar}
         onChange={v => up("about", { avatar: v })}
+        onUploaded={trackUpload}
         label="Profile Photo"
         hint="Square photo recommended · JPG, PNG, WEBP"
       />
@@ -536,7 +540,7 @@ const AboutTab = ({ draft, up }: TabProps) => (
 
 // ── Projects Tab ─────────────────────────────────────────────────────────────
 
-const ProjectsTab = ({ draft, setDraft }: TabProps) => {
+const ProjectsTab = ({ draft, setDraft, trackUpload }: TabProps) => {
   const [expandedProject, setExpandedProject] = useState<number | null>(0);
 
   const addProject = () => {
@@ -585,6 +589,7 @@ const ProjectsTab = ({ draft, setDraft }: TabProps) => {
                     <ImageUpload
                       value={p.image?.startsWith("data:") ? p.image : undefined}
                       onChange={v => updateProject(i, { image: v || p.image })}
+                      onUploaded={trackUpload}
                       label="Project Image"
                       hint="Wide/landscape photo recommended"
                     />
@@ -623,10 +628,11 @@ const ProjectsTab = ({ draft, setDraft }: TabProps) => {
                       )}
                       {/* Upload button */}
                       <MultiImageUpload
-                        onAdd={(base64) => {
+                        onAdd={(url) => {
                           const current = p.images && p.images.length > 0 ? p.images : [p.image];
-                          updateProject(i, { images: [...current, base64] });
+                          updateProject(i, { images: [...current, url] });
                         }}
+                        onUploaded={trackUpload}
                       />
                     </div>
                   </div>
@@ -901,6 +907,27 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
   const [notif, setNotif] = useState<{ type: NotifType; msg: string } | null>(null);
   const [showResetModal, setShowResetModal] = useState(false);
 
+  // Track uploaded Cloudinary URLs — delete if panel closed without saving
+  const pendingUploads = useRef<string[]>([]);
+  const saved = useRef(false);
+
+  // Cleanup unsaved uploads when panel closes
+  useEffect(() => {
+    return () => {
+      if (!saved.current && pendingUploads.current.length > 0) {
+        pendingUploads.current.forEach(url => deleteFromCloudinary(url));
+        pendingUploads.current = [];
+      }
+    };
+  }, []);
+
+  // Wrap setDraft to track new Cloudinary URLs
+  const trackUpload = (url: string) => {
+    if (url && url.includes("cloudinary.com")) {
+      pendingUploads.current.push(url);
+    }
+  };
+
   const showNotif = (type: NotifType, msg: string) => {
     setNotif({ type, msg });
     setTimeout(() => setNotif(null), 3500);
@@ -909,6 +936,8 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
   const handleSave = async () => {
     try {
       await save(draft);
+      saved.current = true;
+      pendingUploads.current = []; // clear — images are saved!
       showNotif("success", "Changes saved! Live on all devices 🌍");
     } catch {
       showNotif("error", "Save failed! Check your connection.");
@@ -924,7 +953,7 @@ const AdminPanel = ({ onClose }: AdminPanelProps) => {
   const up: Updater = (section, patch) =>
     setDraft((d: PortfolioData) => ({ ...d, [section]: { ...(d[section] as object), ...(patch as object) } }));
 
-  const tabProps: TabProps = { draft, setDraft, up };
+  const tabProps: TabProps = { draft, setDraft, up, trackUpload };
 
   const tabContent: Record<Tab, React.ReactNode> = {
     hero:       <HeroTab {...tabProps} />,

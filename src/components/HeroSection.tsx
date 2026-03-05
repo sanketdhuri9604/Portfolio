@@ -84,7 +84,7 @@ const HeroSection = () => {
                 className="relative h-20 w-20 cursor-pointer"
               >
                 <div className="h-20 w-20 rounded-2xl overflow-hidden ring-2 ring-[rgba(0,255,135,0.4)] ring-offset-2 ring-offset-[hsl(140_30%_3%)] shadow-lg shadow-[rgba(0,255,135,0.15)]">
-                  <img src={about.avatar} alt={hero.name} className="h-full w-full object-cover" />
+                  <img src={about.avatar} alt={hero.name} className="h-full w-full object-cover img-blur" onLoad={e => e.currentTarget.classList.add("loaded")} />
                 </div>
               </motion.div>
             </motion.div>
@@ -158,7 +158,7 @@ const HeroSection = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-[rgba(255,255,255,0.07)] text-[rgba(255,255,255,0.5)] transition-all hover:border-[rgba(0,255,135,0.35)] hover:text-[#00FF87] hover:bg-[rgba(0,255,135,0.06)]"
+                  className="social-icon flex h-10 w-10 items-center justify-center rounded-xl border border-[rgba(255,255,255,0.07)] text-[rgba(255,255,255,0.5)] hover:border-[rgba(0,255,135,0.35)] hover:text-[#00FF87] hover:bg-[rgba(0,255,135,0.06)]"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -198,7 +198,8 @@ const HeroSection = () => {
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               src={about.avatar}
               alt={hero.name}
-              className="max-h-[80vh] max-w-[80vw] rounded-2xl shadow-2xl object-cover aspect-square"
+              className="max-h-[80vh] max-w-[80vw] rounded-2xl shadow-2xl object-cover aspect-square img-blur"
+              onLoad={e => e.currentTarget.classList.add("loaded")}
               onClick={e => e.stopPropagation()}
             />
             <button

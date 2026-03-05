@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useInView, useScroll, useTransform } from "framer-motion";
-import { MapPin, Briefcase, GraduationCap, Code2, Coffee, Zap } from "lucide-react";
+import { MapPin, Briefcase, GraduationCap, Code2, Coffee, Zap, Copy, Check } from "lucide-react";
 import { usePortfolio } from "@/usePortfolio";
 
 const iconMap: Record<string, React.ElementType> = { Location: MapPin, Availability: Briefcase, Education: GraduationCap, Focus: Code2, Fuel: Coffee, Superpower: Zap };
@@ -108,7 +108,7 @@ const AboutSection = () => {
                     title={about.avatar ? "Click to enlarge" : ""}
                   >
                     {about.avatar ? (
-                      <img src={about.avatar} alt={hero.name} className="h-full w-full object-cover" />
+                      <img src={about.avatar} alt={hero.name} className="h-full w-full object-cover img-blur" onLoad={e => e.currentTarget.classList.add("loaded")} />
                     ) : (
                       <div className="h-full w-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #00FF87, #00C864)" }}>
                         <span className="text-2xl font-black" style={{ color: "hsl(140 30% 3%)", fontFamily: "'Syne', sans-serif" }}>{initials}</span>
@@ -222,7 +222,8 @@ const AboutSection = () => {
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               src={about.avatar}
               alt={hero.name}
-              className="max-h-[85vh] max-w-[85vw] rounded-3xl shadow-2xl object-contain"
+              className="max-h-[85vh] max-w-[85vw] rounded-3xl shadow-2xl object-contain img-blur"
+              onLoad={e => e.currentTarget.classList.add("loaded")}
               onClick={e => e.stopPropagation()}
             />
             <button
