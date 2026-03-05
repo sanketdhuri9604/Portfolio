@@ -14,8 +14,8 @@ const ParticleCanvas = () => {
     const init = () => { particles.length = 0; const count = Math.floor((W * H) / 14000); for (let i = 0; i < count; i++) particles.push({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, r: Math.random() * 1.5 + 0.5, a: Math.random() * 0.5 + 0.1 }); };
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
-      particles.forEach((p) => { p.x += p.vx; p.y += p.vy; if (p.x < 0) p.x = W; if (p.x > W) p.x = 0; if (p.y < 0) p.y = H; if (p.y > H) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = `rgba(0,255,135,${p.a * 0.4})`; ctx.fill(); });
-      for (let i = 0; i < particles.length; i++) for (let j = i + 1; j < particles.length; j++) { const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const dist = Math.sqrt(dx * dx + dy * dy); if (dist < 100) { ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = `rgba(0,255,135,${0.06 * (1 - dist / 100)})`; ctx.lineWidth = 0.5; ctx.stroke(); } }
+      particles.forEach((p) => { p.x += p.vx; p.y += p.vy; if (p.x < 0) p.x = W; if (p.x > W) p.x = 0; if (p.y < 0) p.y = H; if (p.y > H) p.y = 0; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = `rgba(0,255,135,${p.a * 0.8})`; ctx.fill(); });
+      for (let i = 0; i < particles.length; i++) for (let j = i + 1; j < particles.length; j++) { const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const dist = Math.sqrt(dx * dx + dy * dy); if (dist < 100) { ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = `rgba(0,255,135,${0.15 * (1 - dist / 100)})`; ctx.lineWidth = 0.5; ctx.stroke(); } }
       raf = requestAnimationFrame(draw);
     };
     const ro = new ResizeObserver(() => { resize(); init(); }); ro.observe(canvas); resize(); init(); draw();
@@ -65,7 +65,7 @@ const HeroSection = () => {
 
         {/* Watermark */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 flex items-center justify-center select-none overflow-hidden">
-          <span className="text-[12vw] font-black leading-none tracking-tighter opacity-[0.035]" style={{ fontFamily: "'Syne', sans-serif", color: "#00FF87" }}>{hero.firstName}</span>
+          <span className="text-[12vw] font-black leading-none tracking-tighter opacity-[0.08]" style={{ fontFamily: "'Syne', sans-serif", color: "#00FF87" }}>{hero.firstName}</span>
         </div>
 
         <div className="relative z-10 mx-auto w-full max-w-6xl">
