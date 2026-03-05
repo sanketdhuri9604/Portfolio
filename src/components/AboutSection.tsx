@@ -65,7 +65,7 @@ const AboutSection = () => {
 
   return (
     <>
-      <section ref={sectionRef} id="about" className="py-20 px-6 relative overflow-hidden" aria-labelledby="about-heading">
+      <section ref={sectionRef} id="about" className="py-32 px-6 relative overflow-hidden" aria-labelledby="about-heading">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -left-40 top-1/2 h-80 w-80 -translate-y-1/2 rounded-full blur-[100px]"
