@@ -1,5 +1,6 @@
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { useRef } from "react";
 import { usePortfolio } from "@/usePortfolio";
 import type { Experience } from "@/portfolioData";
 
@@ -8,6 +9,36 @@ const typeStyle: Record<Experience["type"], { bg: string; text: string; border: 
   Internship:   { bg: "rgba(0,217,126,0.08)",   text: "rgba(0,217,126,0.9)",  border: "rgba(0,217,126,0.25)" },
   Freelance:    { bg: "rgba(0,200,100,0.08)",   text: "rgba(0,200,100,0.9)",  border: "rgba(0,200,100,0.25)" },
   "Part-time":  { bg: "rgba(0,230,115,0.08)",   text: "rgba(0,230,115,0.9)",  border: "rgba(0,230,115,0.25)" },
+};
+
+const AnimatedTimelineSection = ({ children }: { children: React.ReactNode }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-100px" });
+
+  return (
+    <div ref={ref} className="relative">
+      {/* Animated timeline line */}
+      <div
+        aria-hidden="true"
+        className="absolute left-6 top-0 bottom-0 w-px md:left-[180px] overflow-hidden"
+        style={{ background: "rgba(255,255,255,0.03)" }}
+      >
+        <motion.div
+          initial={{ scaleY: 0 }}
+          animate={inView ? { scaleY: 1 } : { scaleY: 0 }}
+          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            transformOrigin: "top",
+            height: "100%",
+            width: "100%",
+            background: "linear-gradient(to bottom, rgba(0,255,135,0.5), rgba(0,255,135,0.15), transparent)",
+            boxShadow: "0 0 8px rgba(0,255,135,0.3)",
+          }}
+        />
+      </div>
+      {children}
+    </div>
+  );
 };
 
 const ExperienceSection = () => {
@@ -22,13 +53,7 @@ const ExperienceSection = () => {
           </h2>
         </motion.div>
 
-        <div className="relative">
-          {/* Timeline line */}
-          <div
-            aria-hidden="true"
-            className="absolute left-6 top-0 bottom-0 w-px md:left-[180px]"
-            style={{ background: "linear-gradient(to bottom, rgba(0,255,135,0.3), rgba(255,255,255,0.05), transparent)" }}
-          />
+        <AnimatedTimelineSection>
 
           <div className="space-y-8">
             {data.experiences.map((exp, i) => {
@@ -105,7 +130,7 @@ const ExperienceSection = () => {
               );
             })}
           </div>
-        </div>
+        </AnimatedTimelineSection>
       </div>
     </section>
   );

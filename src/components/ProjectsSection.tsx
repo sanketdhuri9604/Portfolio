@@ -45,7 +45,7 @@ const ImageGallery = ({ images }: { images: string[] }) => {
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
           {images.map((img, i) => (
             <button key={i} onClick={() => setCurrent(i)} className={`shrink-0 h-16 w-24 overflow-hidden rounded-xl border-2 transition-all ${i === current ? "border-[#00FF87]" : "border-transparent opacity-50 hover:opacity-80"}`}>
-              <img src={img} alt={`Thumb ${i + 1}`} className="h-full w-full object-cover" />
+              <img src={img} alt={`Thumb ${i + 1}`} className="h-full w-full object-cover" loading="lazy" />
             </button>
           ))}
         </div>
@@ -150,7 +150,7 @@ const FeaturedCard = ({ p, onClick }: { p: Project; onClick: () => void }) => (
     exit={{ opacity: 0, scale: 0.97 }}
     transition={{ duration: 0.45 }}
     onClick={onClick}
-    className="group relative col-span-full overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] transition-all hover:border-[rgba(0,255,135,0.2)] noise cursor-pointer"
+    className="group relative col-span-full overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] transition-all duration-300 hover:border-[rgba(0,255,135,0.2)] hover:shadow-[0_24px_60px_-10px_rgba(0,255,135,0.12),0_0_0_1px_rgba(0,255,135,0.06)] hover:-translate-y-2 noise cursor-pointer"
   >
     <div className={`absolute inset-0 bg-gradient-to-br ${p.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
     <div className="relative z-10 flex flex-col md:flex-row gap-0">
@@ -190,7 +190,7 @@ const SmallCard = ({ p, i, onClick }: { p: Project; i: number; onClick: () => vo
     exit={{ opacity: 0, scale: 0.97 }}
     transition={{ duration: 0.4, delay: i * 0.07 }}
     onClick={onClick}
-    className="group relative overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] card-lift noise cursor-pointer"
+    className="group relative overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] transition-all duration-300 hover:border-[rgba(0,255,135,0.2)] hover:shadow-[0_20px_50px_-10px_rgba(0,255,135,0.1),0_0_0_1px_rgba(0,255,135,0.06)] hover:-translate-y-1.5 noise cursor-pointer"
   >
     <div className={`absolute inset-0 bg-gradient-to-br ${p.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
     <div className="relative z-10">

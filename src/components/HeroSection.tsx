@@ -3,6 +3,34 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowDown, FileText, Github, Linkedin, Instagram } from "lucide-react";
 import { usePortfolio } from "@/usePortfolio";
 
+// ── Typing Animation Hook ────────────────────────────────────────────────────
+const useTyping = (texts: string[], speed = 80, deleteSpeed = 40, pause = 1800) => {
+  const [displayed, setDisplayed] = useState("");
+  const [idx, setIdx] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const target = texts[idx];
+    if (!deleting && displayed.length < target.length) {
+      const t = setTimeout(() => setDisplayed(target.slice(0, displayed.length + 1)), speed);
+      return () => clearTimeout(t);
+    } else if (!deleting && displayed.length === target.length) {
+      const t = setTimeout(() => setDeleting(true), pause);
+      return () => clearTimeout(t);
+    } else if (deleting && displayed.length > 0) {
+      const t = setTimeout(() => setDisplayed(displayed.slice(0, -1)), deleteSpeed);
+      return () => clearTimeout(t);
+    } else if (deleting && displayed.length === 0) {
+      setDeleting(false);
+      setIdx((idx + 1) % texts.length);
+    }
+  }, [displayed, deleting, idx, texts, speed, deleteSpeed, pause]);
+
+  return displayed;
+};
+
+const TYPING_TEXTS = ["Full-Stack Developer", "AI/ML Engineer", "Problem Solver", "React Developer", "Open to Work 🚀"];
+
 const ParticleCanvas = () => {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -27,6 +55,17 @@ const ParticleCanvas = () => {
 const reveal: import("framer-motion").Variants = {
   hidden: { y: "110%", opacity: 0 },
   show: (i: number) => ({ y: "0%", opacity: 1, transition: { duration: 0.8, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] } })
+};
+
+const TypingEyebrow = () => {
+  const text = useTyping(TYPING_TEXTS);
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+      {text}
+      <span style={{ width: "1.5px", height: "10px", background: "#00FF87", display: "inline-block", animation: "blink-cursor 1s infinite", marginLeft: "1px" }} />
+      <style>{`@keyframes blink-cursor { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
+    </span>
+  );
 };
 
 const HeroSection = () => {
@@ -84,7 +123,7 @@ const HeroSection = () => {
                 className="relative h-20 w-20 cursor-pointer"
               >
                 <div className="h-20 w-20 rounded-2xl overflow-hidden ring-2 ring-[rgba(0,255,135,0.4)] ring-offset-2 ring-offset-[hsl(140_30%_3%)] shadow-lg shadow-[rgba(0,255,135,0.15)]">
-                  <img src={about.avatar} alt={hero.name} className="h-full w-full object-cover img-blur" onLoad={e => e.currentTarget.classList.add("loaded")} />
+                  <img src={about.avatar} alt={hero.name} className="h-full w-full object-cover" />
                 </div>
               </motion.div>
             </motion.div>
@@ -100,7 +139,7 @@ const HeroSection = () => {
           >
             <span className="inline-flex h-1.5 w-1.5 rounded-full bg-[#00FF87] shadow-[0_0_8px_#00FF87] animate-pulse" />
             <span className="w-6 h-px bg-gradient-to-r from-[#00FF87] to-transparent" />
-            {hero.eyebrow}
+            <TypingEyebrow />
           </motion.div>
 
           {/* H1 */}
@@ -158,7 +197,7 @@ const HeroSection = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="social-icon flex h-10 w-10 items-center justify-center rounded-xl border border-[rgba(255,255,255,0.07)] text-[rgba(255,255,255,0.5)] hover:border-[rgba(0,255,135,0.35)] hover:text-[#00FF87] hover:bg-[rgba(0,255,135,0.06)]"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-[rgba(255,255,255,0.07)] text-[rgba(255,255,255,0.5)] transition-all hover:border-[rgba(0,255,135,0.35)] hover:text-[#00FF87] hover:bg-[rgba(0,255,135,0.06)]"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -198,8 +237,7 @@ const HeroSection = () => {
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               src={about.avatar}
               alt={hero.name}
-              className="max-h-[80vh] max-w-[80vw] rounded-2xl shadow-2xl object-cover aspect-square img-blur"
-              onLoad={e => e.currentTarget.classList.add("loaded")}
+              className="max-h-[80vh] max-w-[80vw] rounded-2xl shadow-2xl object-cover aspect-square"
               onClick={e => e.stopPropagation()}
             />
             <button
