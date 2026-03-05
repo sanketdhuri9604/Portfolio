@@ -63,8 +63,8 @@ function PortfolioProvider({ children }: { children: ReactNode }) {
 
   // Retry function — user RETRY click kare toh call hoga
   const retry = useCallback(() => {
-    fetchData(false); // skeleton nahi, sirf toast update hoga
-  }, [fetchData]);
+    window.location.reload();
+  }, []);
 
   const setData = (d: PortfolioData) => setDataState(d);
 
