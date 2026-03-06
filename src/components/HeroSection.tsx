@@ -29,7 +29,7 @@ const useTyping = (texts: string[], speed = 80, deleteSpeed = 40, pause = 1800) 
   return displayed;
 };
 
-const TYPING_TEXTS = ["Full-Stack Developer", "AI/ML Engineer", "Problem Solver", "React Developer", "Open to Work 🚀"];
+const DEFAULT_TYPING_TEXTS = ["Full-Stack Developer", "AI/ML Engineer", "Problem Solver", "React Developer", "Open to Work 🚀"];
 
 const ParticleCanvas = () => {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -57,8 +57,8 @@ const reveal: import("framer-motion").Variants = {
   show: (i: number) => ({ y: "0%", opacity: 1, transition: { duration: 0.8, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] } })
 };
 
-const TypingEyebrow = () => {
-  const text = useTyping(TYPING_TEXTS);
+const TypingEyebrow = ({ texts }: { texts: string[] }) => {
+  const text = useTyping(texts);
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
       {text}
@@ -139,7 +139,7 @@ const HeroSection = () => {
           >
             <span className="inline-flex h-1.5 w-1.5 rounded-full bg-[#00FF87] shadow-[0_0_8px_#00FF87] animate-pulse" />
             <span className="w-6 h-px bg-gradient-to-r from-[#00FF87] to-transparent" />
-            <TypingEyebrow />
+            <TypingEyebrow texts={hero.eyebrow ? hero.eyebrow.split(",").map(s => s.trim()).filter(Boolean) : DEFAULT_TYPING_TEXTS} />
           </motion.div>
 
           {/* H1 */}

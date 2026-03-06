@@ -87,7 +87,7 @@ export const defaultData: PortfolioData = {
     githubUrl: "https://github.com/sanketdhuri",
     linkedinUrl: "https://linkedin.com/in/sanketdhuri",
     resumeUrl: "/resume.pdf",
-    eyebrow: 'Full-Stack Developer & AI Engineer',
+    eyebrow: 'Full-Stack Developer, AI/ML Engineer, Problem Solver, React Developer, Open to Work 🚀',
   },
   about: {
     bio: "I'm a passionate developer from Mumbai with expertise across the full stack — from crafting pixel-perfect React interfaces to building robust Node.js backends and exploring the frontiers of AI and Data Science.",
